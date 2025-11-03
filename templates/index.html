@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OceanHeart</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e88e5;
+            --primary-light: #6ab7ff;
+            --primary-dark: #005cb2;
+            --secondary: #26c6da;
+            --text: #333;
+            --light-bg: #f5f9ff;
+            --white: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 2rem 0;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            letter-spacing: 1px;
+        }
+        
+        header p {
+            margin: 0.5rem 0 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .upload-container {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            font-size: 100px;
+            right: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+        
+        .preview-container {
+            margin-top: 2rem;
+            display: none;
+        }
+        
+        .image-preview {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin: 0 auto 1.5rem;
+            display: block;
+        }
+        
+        .result-container {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+            text-align: center;
+            display: none;
+        }
+        
+        .result-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .result-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+        
+        .result-details {
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .loading i {
+            font-size: 3rem;
+            color: var(--primary);
+            animation: spin 2s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .species-info {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+            text-align: left;
+            display: none;
+        }
+        
+        .species-info h3 {
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .upload-container, .result-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-fish"></i>OceanHeart</h1>
+            <p>Upload an image of a fish to identify its species</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="upload-container">
+            <div class="upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <h2>Upload Fish Image</h2>
+            <p>Select a clear image of a fish to get the most accurate classification</p>
+            
+            <form id="upload-form" enctype="multipart/form-data">
+                <div class="file-input-wrapper">
+                    <button class="btn" type="button">
+                        <i class="fas fa-image"></i> Choose Image
+                    </button>
+                    <input type="file" name="file" id="file-input" accept="image/*">
+                </div>
+                
+                <div class="preview-container" id="preview-container">
+                    <img id="image-preview" class="image-preview" src="#" alt="Preview">
+                    <button class="btn btn-secondary" type="submit" id="predict-btn">
+                        <i class="fas fa-search"></i> Identify Fish Species
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="loading" id="loading">
+            <i class="fas fa-spinner"></i>
+            <p>Analyzing your fish image...</p>
+        </div>
+        
+        <div class="result-container" id="result-container">
+            <div class="result-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Identification Results</h2>
+            <div class="result-text" id="result-text">Waiting for results...</div>
+            <button class="btn" id="new-upload-btn">
+                <i class="fas fa-plus"></i> Classify Another Image
+            </button>
+        </div>
+        
+        <div class="species-info" id="species-info">
+            <h3>About This Species</h3>
+            <div id="species-details">
+                <!-- Species information will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>© 2025 Fish Species Classifier | Powered by TensorFlow</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('file-input');
+            const uploadForm = document.getElementById('upload-form');
+            const imagePreview = document.getElementById('image-preview');
+            const previewContainer = document.getElementById('preview-container');
+            const loadingIndicator = document.getElementById('loading');
+            const resultContainer = document.getElementById('result-container');
+            const resultText = document.getElementById('result-text');
+            const newUploadBtn = document.getElementById('new-upload-btn');
+            const speciesInfo = document.getElementById('species-info');
+            const speciesDetails = document.getElementById('species-details');
+            
+            // Sample species information (you would replace this with your actual species data)
+            const speciesData = {
+                0: {
+                    name: "Black Sea Sprat",
+                    scientificName: "Clupeonella cultriventris",
+                    habitat: "Black Sea and Sea of Azov",
+                    description: "A small fish species belonging to the herring family."
+                },
+                1: {
+                    name: "Gilt-Head Bream",
+                    scientificName: "Sparus aurata",
+                    habitat: "Mediterranean Sea and eastern Atlantic Ocean",
+                    description: "Known for its silver-grey body and distinctive gold bar between its eyes."
+                },
+                2: {
+                    name: "Hourse Mackerel",
+                    scientificName: "Trachurus trachurus",
+                    habitat: "Eastern Atlantic Ocean and Mediterranean Sea",
+                    description: "A common food fish with elongated body and forked tail."
+                },
+                3: {
+                    name: "Red Mullet",
+                    scientificName: "Mullus barbatus",
+                    habitat: "Mediterranean Sea and eastern Atlantic Ocean",
+                    description: "Known for its bright red color and pair of long chemosensory barbels."
+                },
+                4: {
+                    name: "Red Sea Bream",
+                    scientificName: "Pagellus bogaraveo",
+                    habitat: "Mediterranean Sea and eastern Atlantic Ocean",
+                    description: "A deep-bodied fish with pinkish-red coloration."
+                },
+                5: {
+                    name: "Sea Bass",
+                    scientificName: "Dicentrarchus labrax",
+                    habitat: "Mediterranean Sea, Black Sea, and eastern Atlantic Ocean",
+                    description: "A popular sport and food fish with silvery sides and dark back."
+                },
+                6: {
+                    name: "Shrimp",
+                    scientificName: "Various species",
+                    habitat: "Marine and freshwater environments worldwide",
+                    description: "Crustaceans with elongated bodies and primarily swimming locomotion."
+                },
+                7: {
+                    name: "Striped Red Mullet",
+                    scientificName: "Mullus surmuletus",
+                    habitat: "Mediterranean Sea and eastern Atlantic Ocean",
+                    description: "Distinguished by its red coloration with yellow stripes along its body."
+                },
+                8: {
+                    name: "Trout",
+                    scientificName: "Salmo trutta",
+                    habitat: "Freshwater streams and lakes",
+                    description: "A popular sport fish known for its spotted pattern and pink flesh."
+                }
+            };
+            
+            // Handle file selection for preview
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        previewContainer.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Handle form submission
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                
+                if (fileInput.files.length === 0) {
+                    alert('Please select an image first.');
+                    return;
+                }
+                
+                // Show loading indicator
+                loadingIndicator.style.display = 'block';
+                previewContainer.style.display = 'none';
+                resultContainer.style.display = 'none';
+                speciesInfo.style.display = 'none';
+                
+                // Submit the form data to the server
+                // Replace the fetch block in your index.html with this improved version
+fetch('/predict', {
+    method: 'POST',
+    body: formData
+})
+.then(response => {
+    if (!response.ok) {
+        return response.json().then(err => {
+            throw new Error(err.error || `Server error: ${response.status}`);
+        });
+    }
+    return response.json();
+})
+.then(data => {
+    // Hide loading indicator
+    loadingIndicator.style.display = 'none';
+    
+    // Display the result
+    resultContainer.style.display = 'block';
+    
+    if (data.success) {
+        const classNumber = data.class;
+        
+        if (speciesData[classNumber]) {
+            resultText.innerHTML = `Identified as: <strong>${data.species}</strong> <br><span style="font-size: 0.9rem;">(Confidence: ${data.confidence}%)</span>`;
+            
+            // Display species information
+            speciesDetails.innerHTML = `
+                <p><strong>Scientific Name:</strong> ${speciesData[classNumber].scientificName}</p>
+                <p><strong>Habitat:</strong> ${speciesData[classNumber].habitat}</p>
+                <p><strong>Description:</strong> ${speciesData[classNumber].description}</p>
+            `;
+            speciesInfo.style.display = 'block';
+        } else {
+            resultText.innerHTML = `Identified as: <strong>${data.species}</strong> <br><span style="font-size: 0.9rem;">(Confidence: ${data.confidence}%)</span>`;
+            speciesInfo.style.display = 'none';
+        }
+    } else {
+        resultText.innerHTML = `<span style="color: #d32f2f;">Error: ${data.error || 'An unknown error occurred'}</span>`;
+        speciesInfo.style.display = 'none';
+    }
+})
+.catch(error => {
+    loadingIndicator.style.display = 'none';
+    resultContainer.style.display = 'block';
+    resultText.innerHTML = `<span style="color: #d32f2f;">Error: ${error.message || 'Could not process the image. Please try again.'}</span>`;
+    console.error('Error:', error);
+    speciesInfo.style.display = 'none';
+});
+            });
+            
+            // Handle new upload button
+            newUploadBtn.addEventListener('click', function() {
+                // Reset the form
+                uploadForm.reset();
+                previewContainer.style.display = 'none';
+                resultContainer.style.display = 'none';
+                speciesInfo.style.display = 'none';
+            });
+            
+            // Make the button trigger file input
+            document.querySelector('.file-input-wrapper .btn').addEventListener('click', function() {
+                fileInput.click();
+            });
+        });
+    </script>
+</body>
+</html>
